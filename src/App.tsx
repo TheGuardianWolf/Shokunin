@@ -11,6 +11,7 @@ import React, { useMemo } from 'react';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 
 import AppBar from 'app/header/AppBar';
+import GoogleAnalytics from 'components/google-analytics/GoogleAnalytics';
 import Home from 'app/pages/Home';
 import Results from 'app/pages/Results';
 
@@ -48,6 +49,7 @@ export function App() {
   return (
     <Router>
       <ThemeProvider theme={theme}>
+        <GoogleAnalytics />
         <div className={classes.root}>
           <CssBaseline />
           <AppBar />

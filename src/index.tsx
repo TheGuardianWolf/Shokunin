@@ -1,6 +1,7 @@
 import 'react-app-polyfill/ie11';
 import 'react-app-polyfill/stable';
 import 'typeface-roboto';
+import 'components/google-analytics/GoogleAnalytics';
 
 import * as serviceWorker from './serviceWorker';
 
