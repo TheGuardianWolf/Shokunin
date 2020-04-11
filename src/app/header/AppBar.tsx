@@ -76,7 +76,7 @@ export function AppBar() {
   ]);
 
   return (
-    <MaterialAppBar position="static">
+    <MaterialAppBar position="sticky">
       <Toolbar className={classes.toolbar}>
         <IconButton
           color="inherit"

@@ -12,10 +12,14 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { getSearchParams, isEqualSearch } from 'util/search-utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useParams } from 'react-router-dom';
+import { useMediaQuery, useTheme } from '@material-ui/core';
 
 import { selectClient } from 'app/slices/searchSlice';
 
 export function Results() {
+  const theme = useTheme();
+  const isPageNarrow = useMediaQuery(theme.breakpoints.down('xs'));
+
   const postsPerPage = 100;
   const [posts, postsStatus] = useSelector(selectPosts);
   const [postsMeta] = useSelector(selectPostsMeta);
@@ -81,6 +85,8 @@ export function Results() {
       hasMore={hasMorePosts}
       dataLength={images.length}
       next={nextPage}
+      scrollIntoView
+      scrollOffset={isPageNarrow ? -116 : -64}
     />
   );
 }
@@ -93,6 +99,7 @@ export function e621PostsToGalleryImages(posts: E621PostPages) {
       // E621 API returning null for some reason
       if (post.file.url != null) {
         prev.push({
+          htmlId: `post-${post.id}`,
           id: post.id,
           src: post.file.url,
           thumbnail: post.sample.url,

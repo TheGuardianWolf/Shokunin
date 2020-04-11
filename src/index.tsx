@@ -1,3 +1,5 @@
+import 'react-app-polyfill/ie11';
+import 'react-app-polyfill/stable';
 import 'typeface-roboto';
 
 import * as serviceWorker from './serviceWorker';
@@ -7,6 +9,11 @@ import { Provider } from 'react-redux';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { store } from 'app/store';
+
+const scrollBehavior = window.history.scrollRestoration;
+if (scrollBehavior) {
+  window.history.scrollRestoration = 'manual';
+}
 
 ReactDOM.render(
   <Provider store={store}>

@@ -1,5 +1,10 @@
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
+import {
+  LazyLoadImage,
+  ScrollPosition,
+  trackWindowScroll,
+} from 'react-lazy-load-image-component';
 import { ListItem, makeStyles } from '@material-ui/core';
 import {
   PhotoSwipeItem,
@@ -8,9 +13,9 @@ import {
 import React, { useState } from 'react';
 
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
 import Masonry from 'react-masonry-css';
 import ReactResizeDetector from 'react-resize-detector';
+import { isMobile } from 'react-device-detect';
 
 export interface GalleryImage extends PhotoSwipeItem {}
 
@@ -39,23 +44,33 @@ const useStyles = makeStyles(() => ({
 }));
 
 export function ImageGallery({
+  scrollPosition,
   images = [],
   next = () => {},
   hasMore = false,
   loader,
   dataLength = 0,
+  scrollIntoView,
+  scrollOffset = 0,
 }: {
   images?: GalleryImage[];
   next?: () => void;
   hasMore?: boolean;
   loader?: React.ReactNode;
   dataLength?: number;
+  scrollIntoView?: boolean;
+  scrollOffset?: number;
+  scrollPosition: ScrollPosition;
 }) {
   const classes = useStyles();
   const [columnWidth, setColumnWidth] = useState(400);
 
   return (
-    <PhotoSwipeWrapper images={images}>
+    <PhotoSwipeWrapper
+      images={images}
+      scrollIntoView={scrollIntoView}
+      scrollOffset={scrollOffset}
+    >
       {(openPhotoSwipe) => (
         <InfiniteScroll
           dataLength={dataLength}
@@ -83,7 +98,7 @@ export function ImageGallery({
                 refreshRate={300}
                 handleWidth
                 onResize={(width) => setColumnWidth(width)}
-                key={0}
+                key="resize-detector"
               />,
             ].concat(
               images.map((item, index) => (
@@ -91,16 +106,21 @@ export function ImageGallery({
                   className={classes.thumbnail}
                   key={item.id}
                   button
-                  onClick={() => openPhotoSwipe(index)}
+                  onClick={() => {
+                    openPhotoSwipe(index);
+                  }}
                 >
                   <LazyLoadImage
+                    id={item.htmlId}
                     className={classes.thumbnailImage}
+                    tabIndex={index + 1}
                     src={item.thumbnail}
                     alt={item.description}
                     width={columnWidth}
                     height={(columnWidth / item.thumbnailW) * item.thumbnailH}
                     placeholderSrc={item.lazySrc}
-                    effect="blur"
+                    effect={isMobile ? undefined : 'blur'}
+                    scrollPosition={scrollPosition}
                   />
                 </ListItem>
               ))
@@ -112,4 +132,4 @@ export function ImageGallery({
   );
 }
 
-export default ImageGallery;
+export default trackWindowScroll(ImageGallery);

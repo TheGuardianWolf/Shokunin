@@ -1,21 +1,13 @@
 import 'photoswipe/dist/photoswipe.css';
 import 'photoswipe/dist/default-skin/default-skin.css';
 
-import React, {
-  createRef,
-  useCallback,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Function } from 'lodash';
 import PhotoSwipe from 'photoswipe';
 import PhotoSwipeUI_Default from 'photoswipe/dist/photoswipe-ui-default';
-import { isFunction } from 'util';
 
 export interface PhotoSwipeItem extends PhotoSwipe.Item {
+  htmlId: string;
   id: number;
   src: string;
   thumbnail: string;
@@ -36,13 +28,78 @@ export type PhotoSwipeWrapperChildFunction = (
 export function PhotoSwipeWrapper({
   children,
   images = [],
+  scrollIntoView,
+  scrollOffset = 0,
 }: {
   children?: PhotoSwipeWrapperChildFunction;
   images?: PhotoSwipeItem[];
+  scrollIntoView?: boolean;
+  scrollOffset?: number;
 }) {
   const anchor = useRef<HTMLDivElement>(null);
+  const [photoSwipe, setPhotoSwipe] = useState<PhotoSwipe<
+    PhotoSwipeUI_Default.Options
+  > | null>(null);
 
-  const openPhotoSwipe = useCallback((index: number) => {}, []);
+  const openPhotoSwipe = useCallback(
+    (index: number) => {
+      const photoSwipeOptions: PhotoSwipe.Options = {
+        index: index ?? 0,
+        loop: false,
+        preload: [3, 3],
+      };
+
+      let photoSwipe: PhotoSwipe<PhotoSwipeUI_Default.Options> | null = null;
+      if (anchor.current != null) {
+        photoSwipe = new PhotoSwipe<PhotoSwipeUI_Default.Options>(
+          anchor.current,
+          PhotoSwipeUI_Default,
+          images,
+          photoSwipeOptions
+        );
+        if (scrollIntoView) {
+          photoSwipe.listen('afterChange', () => {
+            if (photoSwipe) {
+              const index = photoSwipe.getCurrentIndex();
+              const htmlId = images[index]?.htmlId;
+              if (htmlId) {
+                const element = document.getElementById(htmlId);
+                if (element) {
+                  const rect = element.getBoundingClientRect();
+                  const absoluteElementCenter =
+                    rect.top + rect.height / 2 + window.pageYOffset;
+
+                  window.scrollTo({
+                    top:
+                      absoluteElementCenter -
+                      window.innerHeight / 2 +
+                      scrollOffset,
+                    behavior: 'smooth',
+                  });
+                }
+              }
+            }
+          });
+        }
+        photoSwipe.init();
+      }
+      setPhotoSwipe(photoSwipe);
+      return photoSwipe;
+    },
+    [images, scrollIntoView, scrollOffset]
+  );
+
+  // Update slideshow with newly loaded images
+  useEffect(() => {
+    if (photoSwipe && photoSwipe.items.length < images.length) {
+      photoSwipe.items.splice(
+        photoSwipe.items.length,
+        0,
+        ...images.slice(photoSwipe.items.length)
+      );
+      (photoSwipe.ui as any).update();
+    }
+  }, [photoSwipe, images]);
 
   return (
     <div>
