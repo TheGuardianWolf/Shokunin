@@ -2,6 +2,7 @@ import { AxiosClient, RequestStatus } from 'app/requests';
 import {
   E621PostPages,
   getNextPostsPage,
+  selectClient,
   selectPosts,
   selectPostsMeta,
 } from 'app/slices/e621APISlice';
@@ -14,8 +15,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useParams } from 'react-router-dom';
 import { useMediaQuery, useTheme } from '@material-ui/core';
 
-import { selectClient } from 'app/slices/searchSlice';
-
 export function Results() {
   const theme = useTheme();
   const isPageNarrow = useMediaQuery(theme.breakpoints.down('xs'));
@@ -24,7 +23,7 @@ export function Results() {
   const [posts, postsStatus] = useSelector(selectPosts);
   const [postsMeta] = useSelector(selectPostsMeta);
   const [apiClient] = useSelector(selectClient);
-  const { routeClient } = useParams();
+  const { client: routeClient } = useParams();
   const client = useMemo(
     () => (routeClient as AxiosClient) ?? AxiosClient.E621,
     [routeClient]

@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
-
 import ReactGA from 'react-ga';
+import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
 let gaInit = false;
