@@ -12,7 +12,6 @@ import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 
 import AppBar from 'app/header/AppBar';
 import Home from 'app/pages/Home';
-import { LastLocationProvider } from 'react-router-last-location';
 import Results from 'app/pages/Results';
 
 const useStyles = makeStyles((theme) => ({
@@ -48,21 +47,19 @@ export function App() {
 
   return (
     <Router>
-      <LastLocationProvider>
-        <ThemeProvider theme={theme}>
-          <div className={classes.root}>
-            <CssBaseline />
-            <AppBar />
-            <Paper component="main" className={classes.content}>
-              <Switch>
-                <Route path="/" exact component={Home} />
-                <Route path="/:client" exact component={Home} />
-                <Route path="/:client/search" component={Results} />
-              </Switch>
-            </Paper>
-          </div>
-        </ThemeProvider>
-      </LastLocationProvider>
+      <ThemeProvider theme={theme}>
+        <div className={classes.root}>
+          <CssBaseline />
+          <AppBar />
+          <Paper component="main" className={classes.content}>
+            <Switch>
+              <Route path="/" exact component={Home} />
+              <Route path="/:client" exact component={Home} />
+              <Route path="/:client/search" component={Results} />
+            </Switch>
+          </Paper>
+        </div>
+      </ThemeProvider>
     </Router>
   );
 }
