@@ -31,7 +31,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export function App() {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  // TODO: Fix light theme
+  const prefersDarkMode = true; //useMediaQuery('(prefers-color-scheme: dark)');
 
   const theme = useMemo(
     () =>
