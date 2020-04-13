@@ -55,13 +55,13 @@
   "browserslist": {
     "production": [
       "last 2 versions",
-      "ie11"
+      "ie 11"
     ],
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version",
-      "ie11"
+      "ie 11"
     ]
   },
   "devDependencies": {
