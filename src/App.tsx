@@ -14,6 +14,7 @@ import AppBar from 'app/header/AppBar';
 import GoogleAnalytics from 'components/google-analytics/GoogleAnalytics';
 import Home from 'app/pages/Home';
 import Results from 'app/pages/Results';
+import { hot } from 'react-hot-loader/root';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -66,4 +67,4 @@ export function App() {
   );
 }
 
-export default App;
+export default hot(App);

@@ -17,7 +17,7 @@ import Masonry from 'react-masonry-css';
 import ReactResizeDetector from 'react-resize-detector';
 import { isMobile } from 'react-device-detect';
 
-export interface GalleryImage extends PhotoSwipeItem {}
+export interface GalleryImage extends PhotoSwipeItem<null> {}
 
 const useStyles = makeStyles(() => ({
   thumbnailGrid: {

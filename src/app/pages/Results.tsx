@@ -80,7 +80,7 @@ export function Results() {
 
   return (
     <ImageGallery
-      images={e621PostsToGalleryImages(posts)}
+      images={e621PostsToGalleryImages(posts, apiClient)}
       hasMore={hasMorePosts}
       dataLength={images.length}
       next={nextPage}
@@ -92,7 +92,10 @@ export function Results() {
 
 export default Results;
 
-export function e621PostsToGalleryImages(posts: E621PostPages) {
+export function e621PostsToGalleryImages(
+  posts: E621PostPages,
+  client: AxiosClient = AxiosClient.E621
+) {
   return posts.reduce<GalleryImage[]>((prev, curr): any => {
     curr.forEach((post) => {
       // E621 API returning null for some reason
@@ -107,9 +110,25 @@ export function e621PostsToGalleryImages(posts: E621PostPages) {
           w: post.file.width,
           h: post.file.height,
           description: post.description,
+          title: `Artist${post.tags.artist.length > 1 ? 's' : ''}: ${
+            post.tags.artist.length > 0
+              ? post.tags.artist.join(', ')
+              : 'unknown'
+          }`,
           author: post.tags.artist.join(', '),
           msrc: post.sample.url,
           lazySrc: post.preview.url,
+          m: {
+            src: post.sample.url,
+            w: post.sample.width,
+            h: post.sample.height,
+          },
+          o: {
+            src: post.file.url,
+            w: post.file.width,
+            h: post.file.height,
+          },
+          externalLink: `https://${client}.net/posts/${post.id}`,
         });
       }
     });
