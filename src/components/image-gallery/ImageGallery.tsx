@@ -17,7 +17,16 @@ import Masonry from 'react-masonry-css';
 import ReactResizeDetector from 'react-resize-detector';
 import { isMobile } from 'react-device-detect';
 
-export interface GalleryImage extends PhotoSwipeItem<null> {}
+export interface GalleryImageThumbnail {
+  src: string;
+  w: number;
+  h: number;
+  overlay?: React.ReactNode;
+}
+
+export interface GalleryImage extends PhotoSwipeItem {
+  thumbnail: GalleryImageThumbnail;
+}
 
 const useStyles = makeStyles(() => ({
   thumbnailGrid: {
@@ -33,6 +42,11 @@ const useStyles = makeStyles(() => ({
     width: 'auto',
     padding: 0,
     marginBottom: '15px',
+    '&:hover': {
+      '& $thumbnailOverlay': {
+        opacity: 1,
+      },
+    },
   },
   thumbnailImage: {
     width: '100%',
@@ -40,6 +54,16 @@ const useStyles = makeStyles(() => ({
     display: 'block',
     margin: '0 auto',
     outline: 0,
+    position: 'relative',
+  },
+  thumbnailOverlay: {
+    position: 'absolute',
+    opacity: 0,
+    transition: 'opacity 0.2s ease',
+    top: 0,
+    left: 0,
+    height: '100%',
+    width: '100%',
   },
 }));
 
@@ -114,14 +138,17 @@ export function ImageGallery({
                     id={item.htmlId}
                     className={classes.thumbnailImage}
                     tabIndex={index + 1}
-                    src={item.thumbnail}
+                    src={item.thumbnail.src}
                     alt={item.description}
                     width={columnWidth}
-                    height={(columnWidth / item.thumbnailW) * item.thumbnailH}
+                    height={(columnWidth / item.thumbnail.w) * item.thumbnail.h}
                     placeholderSrc={item.lazySrc}
                     effect={isMobile ? undefined : 'blur'}
                     scrollPosition={scrollPosition}
                   />
+                  <div className={classes.thumbnailOverlay}>
+                    {item.thumbnail.overlay}
+                  </div>
                 </ListItem>
               ))
             )}

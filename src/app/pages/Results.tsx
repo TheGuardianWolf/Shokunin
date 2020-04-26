@@ -10,12 +10,26 @@ import ImageGallery, {
   GalleryImage,
 } from 'components/image-gallery/ImageGallery';
 import React, { useCallback, useEffect, useMemo } from 'react';
+import { Tabs, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import { getSearchParams, isEqualSearch } from 'util/search-utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useParams } from 'react-router-dom';
-import { useMediaQuery, useTheme } from '@material-ui/core';
+
+import ImageInfo from 'components/image-info/ImageInfo';
+
+const useStyles = makeStyles(() => ({
+  imageOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    height: '60px',
+    backgroundColor: 'rgba(0,0,0,0.65)',
+  },
+}));
 
 export function Results() {
+  const classes = useStyles();
   const theme = useTheme();
   const isPageNarrow = useMediaQuery(theme.breakpoints.down('xs'));
 
@@ -55,7 +69,10 @@ export function Results() {
     return true;
   }, [posts]);
 
-  const images = useMemo(() => e621PostsToGalleryImages(posts), [posts]);
+  const images = useMemo(() => e621PostsToGalleryImages(posts, classes), [
+    posts,
+    classes,
+  ]);
 
   const needsInit = useMemo(
     () =>
@@ -80,7 +97,7 @@ export function Results() {
 
   return (
     <ImageGallery
-      images={e621PostsToGalleryImages(posts, apiClient)}
+      images={e621PostsToGalleryImages(posts, classes, apiClient)}
       hasMore={hasMorePosts}
       dataLength={images.length}
       next={nextPage}
@@ -94,6 +111,7 @@ export default Results;
 
 export function e621PostsToGalleryImages(
   posts: E621PostPages,
+  classes: ReturnType<typeof useStyles>,
   client: AxiosClient = AxiosClient.E621
 ) {
   return posts.reduce<GalleryImage[]>((prev, curr): any => {
@@ -104,31 +122,29 @@ export function e621PostsToGalleryImages(
           htmlId: `post-${post.id}`,
           id: post.id,
           src: post.file.url,
-          thumbnail: post.sample.url,
-          thumbnailW: post.sample.width,
-          thumbnailH: post.sample.height,
           w: post.file.width,
           h: post.file.height,
           description: post.description,
-          title: `Artist${post.tags.artist.length > 1 ? 's' : ''}: ${
-            post.tags.artist.length > 0
-              ? post.tags.artist.join(', ')
-              : 'unknown'
-          }`,
-          author: post.tags.artist.join(', '),
           msrc: post.sample.url,
           lazySrc: post.preview.url,
-          m: {
+          externalLink: `https://${client}.net/posts/${post.id}`,
+          captionEl: (expanded, setExpanded) => (
+            <ImageInfo
+              post={post}
+              expanded={expanded}
+              setExpanded={setExpanded}
+            />
+          ),
+          thumbnail: {
             src: post.sample.url,
             w: post.sample.width,
             h: post.sample.height,
+            overlay: (
+              <div
+                className={classes.imageOverlay}
+              >{`${post.score.up} ${post.score.down} ${post.score.total}`}</div>
+            ),
           },
-          o: {
-            src: post.file.url,
-            w: post.file.width,
-            h: post.file.height,
-          },
-          externalLink: `https://${client}.net/posts/${post.id}`,
         });
       }
     });

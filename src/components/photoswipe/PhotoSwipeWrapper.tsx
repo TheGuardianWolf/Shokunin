@@ -11,6 +11,7 @@ import {
 import React, {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -34,32 +35,18 @@ const PLAYBACK_ICON_STATE: React.ReactNode[] = [
   <PauseOutlined />,
 ];
 
-export interface PhotoSwipeItem<I> extends PhotoSwipeUI_Default.Item {
+export interface PhotoSwipeItem extends PhotoSwipeUI_Default.Item {
+  description: string;
   htmlId: string;
   id: number;
-  src: string;
-  thumbnail: string;
   w: number;
   h: number;
-  thumbnailW: number;
-  thumbnailH: number;
-  description: string;
-  title: string;
-  author: string;
-  msrc: string;
-  m?: {
-    src: string;
-    w: number;
-    h: number;
-  };
-  o?: {
-    src: string;
-    w: number;
-    h: number;
-  };
   lazySrc: string;
-  info?: I | undefined;
   externalLink?: string;
+  captionEl?: (
+    expanded: boolean,
+    setInfoExpanded: React.Dispatch<React.SetStateAction<boolean>>
+  ) => React.ReactNode;
 }
 
 export type PhotoSwipeWrapperChildFunction = (
@@ -75,17 +62,19 @@ const useStyles = makeStyles((theme) => ({
       opacity: 1,
     },
     '& .pswp__caption': {
-      backgroundColor: theme.palette.background.paper,
+      backgroundColor: theme.palette.background.default,
       boxShadow: theme.shadows[4],
-      cursor: 'pointer',
       transition: 'all 0.2s ease',
-      height: '44px',
+      height: '70vh',
       minHeight: 0,
       overflow: 'hidden',
+      transform: 'translateY(calc(-60px + 70vh))',
       '&.expanded': {
-        height: '70%',
-        overflowY: 'auto',
+        height: '70vh',
         transform: 'none',
+      },
+      '&.show': {
+        display: 'block',
       },
     },
     '& .pswp__bg': {
@@ -121,16 +110,19 @@ const useStyles = makeStyles((theme) => ({
       width: '19px',
     },
   },
+  hidden: {
+    display: 'none',
+  },
 }));
 
-export function PhotoSwipeWrapper<I>({
+export function PhotoSwipeWrapper({
   children,
   images = [],
   scrollIntoView,
   scrollOffset = 0,
 }: {
   children?: PhotoSwipeWrapperChildFunction;
-  images?: PhotoSwipeItem<I>[];
+  images?: PhotoSwipeItem[];
   scrollIntoView?: boolean;
   scrollOffset?: number;
 }) {
@@ -149,11 +141,12 @@ export function PhotoSwipeWrapper<I>({
     setPlaybackInterval,
   ] = useState<NodeJS.Timeout | null>(null);
   const [infoExpanded, setInfoExpanded] = useState<boolean>(false);
+  const [currentIndex, setCurrentIndex] = useState<number | null>(null);
 
-  const currentPhotoSwipeItem = useMemo(
-    () => (photoSwipe ? images[photoSwipe.getCurrentIndex()] : null),
-    [photoSwipe, images]
-  );
+  const currentPhotoSwipeItem = useMemo(() => {
+    const item = currentIndex != null ? images[currentIndex] : null;
+    return item;
+  }, [currentIndex, images]);
 
   const openPhotoSwipe = useCallback(
     (index: number) => {
@@ -163,6 +156,7 @@ export function PhotoSwipeWrapper<I>({
         preload: [3, 3],
         closeElClasses: [],
         closeOnScroll: false,
+        closeOnVerticalDrag: false,
         window: window,
       };
 
@@ -174,33 +168,17 @@ export function PhotoSwipeWrapper<I>({
           images,
           photoSwipeOptions
         );
-        if (scrollIntoView) {
-          photoSwipe.listen('afterChange', () => {
-            if (photoSwipe) {
-              const index = photoSwipe.getCurrentIndex();
-              const htmlId = images[index]?.htmlId;
-              if (htmlId) {
-                const element = document.getElementById(htmlId);
-                if (element) {
-                  const rect = element.getBoundingClientRect();
-                  const absoluteElementCenter =
-                    rect.top + rect.height / 2 + window.pageYOffset;
 
-                  window.scrollTo({
-                    top:
-                      absoluteElementCenter -
-                      window.innerHeight / 2 +
-                      scrollOffset,
-                    behavior: 'smooth',
-                  });
-                }
-              }
-            }
-          });
-        }
+        photoSwipe.listen('beforeChange', () => {
+          setCurrentIndex(photoSwipe?.getCurrentIndex() ?? null);
+        });
         photoSwipe.listen('close', () => {
           setPlaybackState(PlaybackState.PAUSED);
           setInfoExpanded(false);
+          setPhotoSwipe(null);
+        });
+        photoSwipe.listen('preventDragEvent', (e, isDown, preventObj) => {
+          preventObj.prevent = !('ontouchstart' in document.documentElement);
         });
         photoSwipe.init();
       }
@@ -208,8 +186,39 @@ export function PhotoSwipeWrapper<I>({
       return photoSwipe;
     },
     //eslint-disable-next-line
-    [images, scrollIntoView, scrollOffset]
+    [images]
   );
+
+  // When photoswipe opens, remove scrollbars, then restore when it closes
+  useLayoutEffect(() => {
+    if (photoSwipe) {
+      window.document.body.style.overflowY = 'hidden';
+    } else {
+      window.document.body.style.overflowY = 'auto';
+    }
+  }, [photoSwipe]);
+
+  // When photoswipe closes, scroll to image
+  useEffect(() => {
+    if (!photoSwipe && scrollIntoView && currentIndex) {
+      const index = currentIndex;
+      const htmlId = images[index]?.htmlId;
+      if (htmlId) {
+        const element = document.getElementById(htmlId);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          const absoluteElementCenter =
+            rect.top + rect.height / 2 + window.pageYOffset;
+
+          window.scrollTo({
+            top: absoluteElementCenter - window.innerHeight / 2 + scrollOffset,
+            behavior: 'smooth',
+          });
+        }
+      }
+    }
+    //eslint-disable-next-line
+  }, [photoSwipe]);
 
   // Remove the hash on load if photoswipe is closed
   useEffect(() => {
@@ -301,7 +310,12 @@ export function PhotoSwipeWrapper<I>({
                 title="Zoom in/out"
               ></button>
               <button
-                className={clsx('pswp__button', classes.btn, classes.btnAdjust)}
+                className={clsx(
+                  'pswp__button',
+                  classes.btn,
+                  classes.btnAdjust,
+                  !currentPhotoSwipeItem?.captionEl && 'hidden'
+                )}
                 title="Info"
                 onClick={() => setInfoExpanded((i) => !i)}
               >
@@ -353,10 +367,19 @@ export function PhotoSwipeWrapper<I>({
               title="Next (arrow right)"
             ></button>
             <div
-              className={clsx('pswp__caption', infoExpanded && 'expanded')}
-              onClick={() => setInfoExpanded((i) => !i)}
+              className={clsx(
+                'pswp__caption',
+                currentPhotoSwipeItem?.captionEl && 'show',
+                infoExpanded && 'expanded'
+              )}
             >
-              <div className="pswp__caption__center"></div>
+              <div
+                className={clsx('pswp__caption__center', classes.hidden)}
+              ></div>
+              {(currentPhotoSwipeItem?.captionEl ?? (() => null))(
+                infoExpanded,
+                setInfoExpanded
+              )}
             </div>
           </div>
         </div>

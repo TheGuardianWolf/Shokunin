@@ -155,6 +155,12 @@ export enum E621Rating {
   Explicit = 'e',
 }
 
+export const E621RatingStringMap = Object.freeze({
+  s: 'Safe',
+  q: 'Questionable',
+  e: 'Explicit',
+});
+
 export type E621BaseImage = {
   width: number;
   height: number;
@@ -212,8 +218,8 @@ export type E621Payload = {
 
 export type E621Post = {
   id: number;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
   file: E621File;
   preview: E621Preview;
   sample: E621Sample;
