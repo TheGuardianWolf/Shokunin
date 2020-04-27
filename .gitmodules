@@ -1,0 +1,3 @@
+[submodule "lib/PhotoSwipe"]
+	path = lib/PhotoSwipe
+	url = https://github.com/TheGuardianWolf/PhotoSwipe/
