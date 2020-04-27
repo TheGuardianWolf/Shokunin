@@ -24,7 +24,6 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     height: '100%',
     margin: '0 auto',
-    backgroundColor: theme.palette.background.default,
     display: 'flex',
     flexDirection: 'column',
     '& > section': {
@@ -32,12 +31,11 @@ const useStyles = makeStyles((theme) => ({
       flexDirection: 'column',
       overflow: 'hidden',
       '& > header': {
-        backgroundColor: theme.palette.background.paper,
         boxShadow: theme.shadows[4],
         cursor: 'pointer',
-        height: '60px',
+        height: '44px',
         width: '100%',
-        minHeight: '60px',
+        minHeight: '44px',
       },
     },
   },
@@ -62,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
   },
   headerText: {
     display: 'inline',
-    fontSize: '22px',
+    fontSize: '18px',
     fontWeight: 700,
     marginLeft: '10px',
   },
@@ -71,7 +69,6 @@ const useStyles = makeStyles((theme) => ({
     padding: '10px 30px',
     justifyContent: 'space-between',
   },
-  rating: {},
   score: {},
   tags: {
     '& > div': {
@@ -87,7 +84,9 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     color: theme.palette.text.hint,
   },
-  metaItemValue: {},
+  metaItemValue: {
+    whiteSpace: 'pre-line',
+  },
 }));
 
 export function ImageInfo({
@@ -102,6 +101,7 @@ export function ImageInfo({
   const classes = useStyles();
   const metaData = new Map<string, string>([
     ['id', String(post.id)],
+    ['rating', E621RatingStringMap[post.rating]],
     ['created at', new Date(post.created_at).toLocaleString()],
     ['updated at', new Date(post.updated_at).toLocaleString()],
     ['approved by', String(post.approver_id ?? 'Pending approval')],
@@ -109,11 +109,11 @@ export function ImageInfo({
     ['md5', post.file.md5],
     [
       post.sources.length > 1 ? 'sources' : 'source',
-      post.sources.length > 0 ? post.sources.join(', ') : 'None',
+      post.sources.length > 0 ? post.sources.join('\n') : 'None',
     ],
     [
       post.pools.length > 1 ? 'pools' : 'pool',
-      post.pools.length > 0 ? post.pools.join(', ') : 'None',
+      post.pools.length > 0 ? post.pools.join('\n') : 'None',
     ],
     ['parent', String(post.relationships.parentId ?? 'None')],
     [
@@ -138,14 +138,13 @@ export function ImageInfo({
                   : 'Unknown'}
               </span>
             </div>
-            <div className={classes.rating}>
-              <h4 className={classes.headerTextTitle}>Rating</h4>
-              <span className={classes.headerText}>
-                {E621RatingStringMap[post.rating]}
-              </span>
-            </div>
             <div className={classes.score}>
-              <ImageScore postScore={post.score} />
+              <ImageScore
+                upCount={post.score.up}
+                downCount={post.score.down}
+                favCount={post.fav_count}
+                commentCount={post.comment_count}
+              />
             </div>
           </div>
         </header>

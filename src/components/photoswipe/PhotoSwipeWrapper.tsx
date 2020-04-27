@@ -2,6 +2,8 @@ import 'photoswipe/dist/photoswipe.css';
 import 'photoswipe/dist/default-skin/default-skin.css';
 
 import {
+  ChevronLeftSharp,
+  ChevronRightSharp,
   FastForwardOutlined,
   InfoOutlined,
   OpenInNewOutlined,
@@ -55,6 +57,9 @@ export type PhotoSwipeWrapperChildFunction = (
 
 const useStyles = makeStyles((theme) => ({
   photoSwipe: {
+    '& .pswp__img:last-child': {
+      boxShadow: theme.shadows[16],
+    },
     '& .pswp__top-bar': {
       transition: 'all 0.2s ease',
       backgroundColor: theme.palette.background.paper,
@@ -62,16 +67,18 @@ const useStyles = makeStyles((theme) => ({
       opacity: 1,
     },
     '& .pswp__caption': {
-      backgroundColor: theme.palette.background.default,
+      backgroundColor: theme.palette.background.paper,
       boxShadow: theme.shadows[4],
       transition: 'all 0.2s ease',
       height: '70vh',
       minHeight: 0,
       overflow: 'hidden',
-      transform: 'translateY(calc(-60px + 70vh))',
+      transform: 'translateY(calc(-44px + 70vh))',
       '&.expanded': {
-        height: '70vh',
         transform: 'none',
+        backgroundColor: theme.palette.background.paper,
+        boxShadow: theme.shadows[4],
+        opacity: 1,
       },
       '&.show': {
         display: 'block',
@@ -81,20 +88,33 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: theme.palette.background.default,
     },
     '& .pswp__ui--idle': {
+      '& .pswp__button--arrow--right, & .pswp__button--arrow--left': {
+        opacity: 0.5,
+      },
       '& .pswp__top-bar': {
-        transform: 'translateY(-100%)',
+        backgroundColor: 'transparent',
+        boxShadow: 'none',
+        opacity: 0.7,
       },
       '& .pswp__caption': {
-        transform: 'translateY(100%)',
+        backgroundColor: 'transparent',
+        boxShadow: 'none',
+        opacity: 0.7,
       },
     },
     '& .pswp__button--arrow--right::before': {
-      backgroundColor: theme.palette.background.paper,
-      boxShadow: theme.shadows[4],
+      background: 'none',
+      right: 'auto',
+      top: 'auto',
+      width: '35px',
+      height: '35px',
     },
     '& .pswp__button--arrow--left::before': {
-      backgroundColor: theme.palette.background.paper,
-      boxShadow: theme.shadows[4],
+      background: 'none',
+      left: 'auto',
+      top: 'auto',
+      width: '35px',
+      height: '35px',
     },
   },
   btn: {
@@ -157,6 +177,7 @@ export function PhotoSwipeWrapper({
         closeElClasses: [],
         closeOnScroll: false,
         closeOnVerticalDrag: false,
+        clickToCloseNonZoomable: false,
         window: window,
       };
 
@@ -171,6 +192,28 @@ export function PhotoSwipeWrapper({
 
         photoSwipe.listen('beforeChange', () => {
           setCurrentIndex(photoSwipe?.getCurrentIndex() ?? null);
+        });
+        photoSwipe.listen('afterChange', () => {
+          if (photoSwipe && scrollIntoView) {
+            const index = photoSwipe.getCurrentIndex();
+            const htmlId = images[index]?.htmlId;
+            if (htmlId) {
+              const element = document.getElementById(htmlId);
+              if (element) {
+                const rect = element.getBoundingClientRect();
+                const absoluteElementCenter =
+                  rect.top + rect.height / 2 + window.pageYOffset;
+
+                window.scrollTo({
+                  top:
+                    absoluteElementCenter -
+                    window.innerHeight / 2 +
+                    scrollOffset,
+                  behavior: 'smooth',
+                });
+              }
+            }
+          }
         });
         photoSwipe.listen('close', () => {
           setPlaybackState(PlaybackState.PAUSED);
@@ -190,35 +233,35 @@ export function PhotoSwipeWrapper({
   );
 
   // When photoswipe opens, remove scrollbars, then restore when it closes
-  useLayoutEffect(() => {
-    if (photoSwipe) {
-      window.document.body.style.overflowY = 'hidden';
-    } else {
-      window.document.body.style.overflowY = 'auto';
-    }
-  }, [photoSwipe]);
+  // useLayoutEffect(() => {
+  //   if (photoSwipe) {
+  //     window.document.body.style.overflowY = 'hidden';
+  //   } else {
+  //     window.document.body.style.overflowY = 'auto';
+  //   }
+  // }, [photoSwipe]);
 
-  // When photoswipe closes, scroll to image
-  useEffect(() => {
-    if (!photoSwipe && scrollIntoView && currentIndex) {
-      const index = currentIndex;
-      const htmlId = images[index]?.htmlId;
-      if (htmlId) {
-        const element = document.getElementById(htmlId);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          const absoluteElementCenter =
-            rect.top + rect.height / 2 + window.pageYOffset;
+  // // When photoswipe closes, scroll to image
+  // useEffect(() => {
+  //   if (!photoSwipe && scrollIntoView && currentIndex) {
+  //     const index = currentIndex;
+  //     const htmlId = images[index]?.htmlId;
+  //     if (htmlId) {
+  //       const element = document.getElementById(htmlId);
+  //       if (element) {
+  //         const rect = element.getBoundingClientRect();
+  //         const absoluteElementCenter =
+  //           rect.top + rect.height / 2 + window.pageYOffset;
 
-          window.scrollTo({
-            top: absoluteElementCenter - window.innerHeight / 2 + scrollOffset,
-            behavior: 'smooth',
-          });
-        }
-      }
-    }
-    //eslint-disable-next-line
-  }, [photoSwipe]);
+  //         window.scrollTo({
+  //           top: absoluteElementCenter - window.innerHeight / 2 + scrollOffset,
+  //           behavior: 'smooth',
+  //         });
+  //       }
+  //     }
+  //   }
+  //   //eslint-disable-next-line
+  // }, [photoSwipe]);
 
   // Remove the hash on load if photoswipe is closed
   useEffect(() => {
@@ -361,11 +404,15 @@ export function PhotoSwipeWrapper({
             <button
               className="pswp__button pswp__button--arrow--left"
               title="Previous (arrow left)"
-            ></button>
+            >
+              <ChevronLeftSharp color="action" fontSize="large" />
+            </button>
             <button
               className="pswp__button pswp__button--arrow--right"
               title="Next (arrow right)"
-            ></button>
+            >
+              <ChevronRightSharp color="action" fontSize="large" />
+            </button>
             <div
               className={clsx(
                 'pswp__caption',
