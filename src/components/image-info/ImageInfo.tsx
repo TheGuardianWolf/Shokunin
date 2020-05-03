@@ -9,6 +9,7 @@ import { capitalize, omit } from 'lodash';
 import ImageScore from './ImageScore';
 import React from 'react';
 import clsx from 'clsx';
+import { colors } from '@material-ui/core';
 import { useState } from 'react';
 
 const useStyles = makeStyles((theme) => ({
@@ -74,6 +75,25 @@ const useStyles = makeStyles((theme) => ({
     '& > div': {
       marginRight: '5px',
       marginBottom: '5px',
+
+      '&.general': {
+        backgroundColor: colors.deepPurple.A700,
+      },
+      '&.species': {
+        backgroundColor: colors.indigo.A700,
+      },
+      '&.character': {
+        backgroundColor: colors.cyan.A700,
+      },
+      '&.copyright': {
+        backgroundColor: colors.green.A700,
+      },
+      '&.lore': {
+        backgroundColor: colors.amber.A700,
+      },
+      '&.meta': {
+        backgroundColor: colors.deepOrange.A700,
+      },
     },
   },
   meta: {},
