@@ -59,6 +59,7 @@ const useStyles = makeStyles((theme) => ({
   photoSwipe: {
     '& .pswp__img:last-child': {
       boxShadow: theme.shadows[16],
+      backgroundColor: theme.palette.background.paper,
     },
     '& .pswp__top-bar': {
       transition: 'all 0.2s ease',
