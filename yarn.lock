@@ -8206,8 +8206,9 @@ performance-now@^2.1.0:
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
 
-"photoswipe@file:./lib/PhotoSwipe":
+"photoswipe@https://github.com/TheGuardianWolf/PhotoSwipe#cfa0dd85":
   version "4.1.3"
+  resolved "https://github.com/TheGuardianWolf/PhotoSwipe#cfa0dd854a0c442310c615837400efce01c28f1c"
 
 picomatch@^2.0.4, picomatch@^2.0.7:
   version "2.2.2"
