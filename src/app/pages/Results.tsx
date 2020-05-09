@@ -139,11 +139,11 @@ export function e621PostsToGalleryImages(
             src: post.sample.url,
             w: post.sample.width,
             h: post.sample.height,
-            overlay: (
-              <div
-                className={classes.imageOverlay}
-              >{`${post.score.up} ${post.score.down} ${post.score.total}`}</div>
-            ),
+            // overlay: (
+            //   <div
+            //     className={classes.imageOverlay}
+            //   >{`${post.score.up} ${post.score.down} ${post.score.total}`}</div>
+            // ),
           },
         });
       }

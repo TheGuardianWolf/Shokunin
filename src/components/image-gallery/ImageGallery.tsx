@@ -28,7 +28,7 @@ export interface GalleryImage extends PhotoSwipeItem {
   thumbnail: GalleryImageThumbnail;
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   thumbnailGrid: {
     display: 'flex',
     marginLeft: '-30px' /* gutter size offset */,
@@ -42,11 +42,12 @@ const useStyles = makeStyles(() => ({
     width: 'auto',
     padding: 0,
     marginBottom: '15px',
-    '&:hover': {
-      '& $thumbnailOverlay': {
-        opacity: 1,
-      },
-    },
+    boxShadow: theme.shadows[8],
+    // '&:hover': {
+    //   '& $thumbnailOverlay': {
+    //     opacity: 1,
+    //   },
+    // },
   },
   thumbnailImage: {
     width: '100%',
@@ -56,15 +57,15 @@ const useStyles = makeStyles(() => ({
     outline: 0,
     position: 'relative',
   },
-  thumbnailOverlay: {
-    position: 'absolute',
-    opacity: 0,
-    transition: 'opacity 0.2s ease',
-    top: 0,
-    left: 0,
-    height: '100%',
-    width: '100%',
-  },
+  // thumbnailOverlay: {
+  //   position: 'absolute',
+  //   opacity: 0,
+  //   transition: 'opacity 0.2s ease',
+  //   top: 0,
+  //   left: 0,
+  //   height: '100%',
+  //   width: '100%',
+  // },
 }));
 
 export function ImageGallery({
@@ -146,9 +147,9 @@ export function ImageGallery({
                     effect={isMobile ? undefined : 'blur'}
                     scrollPosition={scrollPosition}
                   />
-                  <div className={classes.thumbnailOverlay}>
+                  {/* <div className={classes.thumbnailOverlay}>
                     {item.thumbnail.overlay}
-                  </div>
+                  </div> */}
                 </ListItem>
               ))
             )}
