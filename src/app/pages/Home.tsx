@@ -40,14 +40,15 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 700,
   },
   searchImage: {
-    width: '300px',
-    maxWidth: '100%',
-    height: 'auto',
+    width: 'auto',
+    height: '300px',
+    maxHeight: '40vh',
     display: 'block',
     filter: theme.palette.type === 'dark' ? 'invert(1)' : 'none',
   },
   searchImageContainer: {
     margin: '20px auto',
+    marginBottom: '20px',
   },
   searchIcon: {
     padding: 10,

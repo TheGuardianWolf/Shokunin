@@ -180,6 +180,7 @@ export function PhotoSwipeWrapper({
         closeOnVerticalDrag: false,
         clickToCloseNonZoomable: false,
         window: window,
+        tapToToggleControls: false,
       };
 
       let photoSwipe: PhotoSwipe<PhotoSwipeUI_Default.Options> | null = null;
@@ -194,28 +195,28 @@ export function PhotoSwipeWrapper({
         photoSwipe.listen('beforeChange', () => {
           setCurrentIndex(photoSwipe?.getCurrentIndex() ?? null);
         });
-        photoSwipe.listen('afterChange', () => {
-          if (photoSwipe && scrollIntoView) {
-            const index = photoSwipe.getCurrentIndex();
-            const htmlId = images[index]?.htmlId;
-            if (htmlId) {
-              const element = document.getElementById(htmlId);
-              if (element) {
-                const rect = element.getBoundingClientRect();
-                const absoluteElementCenter =
-                  rect.top + rect.height / 2 + window.pageYOffset;
+        // photoSwipe.listen('afterChange', () => {
+        //   if (photoSwipe && scrollIntoView) {
+        //     const index = photoSwipe.getCurrentIndex();
+        //     const htmlId = images[index]?.htmlId;
+        //     if (htmlId) {
+        //       const element = document.getElementById(htmlId);
+        //       if (element) {
+        //         const rect = element.getBoundingClientRect();
+        //         const absoluteElementCenter =
+        //           rect.top + rect.height / 2 + window.pageYOffset;
 
-                window.scrollTo({
-                  top:
-                    absoluteElementCenter -
-                    window.innerHeight / 2 +
-                    scrollOffset,
-                  behavior: 'smooth',
-                });
-              }
-            }
-          }
-        });
+        //         window.scrollTo({
+        //           top:
+        //             absoluteElementCenter -
+        //             window.innerHeight / 2 +
+        //             scrollOffset,
+        //           behavior: 'smooth',
+        //         });
+        //       }
+        //     }
+        //   }
+        // });
         photoSwipe.listen('close', () => {
           setPlaybackState(PlaybackState.PAUSED);
           setInfoExpanded(false);
@@ -234,35 +235,35 @@ export function PhotoSwipeWrapper({
   );
 
   // When photoswipe opens, remove scrollbars, then restore when it closes
-  // useLayoutEffect(() => {
-  //   if (photoSwipe) {
-  //     window.document.body.style.overflowY = 'hidden';
-  //   } else {
-  //     window.document.body.style.overflowY = 'auto';
-  //   }
-  // }, [photoSwipe]);
+  useLayoutEffect(() => {
+    if (photoSwipe) {
+      window.document.body.style.overflowY = 'hidden';
+    } else {
+      window.document.body.style.overflowY = 'auto';
+    }
+  }, [photoSwipe]);
 
-  // // When photoswipe closes, scroll to image
-  // useEffect(() => {
-  //   if (!photoSwipe && scrollIntoView && currentIndex) {
-  //     const index = currentIndex;
-  //     const htmlId = images[index]?.htmlId;
-  //     if (htmlId) {
-  //       const element = document.getElementById(htmlId);
-  //       if (element) {
-  //         const rect = element.getBoundingClientRect();
-  //         const absoluteElementCenter =
-  //           rect.top + rect.height / 2 + window.pageYOffset;
+  // When photoswipe closes, scroll to image
+  useEffect(() => {
+    if (!photoSwipe && scrollIntoView && currentIndex) {
+      const index = currentIndex;
+      const htmlId = images[index]?.htmlId;
+      if (htmlId) {
+        const element = document.getElementById(htmlId);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          const absoluteElementCenter =
+            rect.top + rect.height / 2 + window.pageYOffset;
 
-  //         window.scrollTo({
-  //           top: absoluteElementCenter - window.innerHeight / 2 + scrollOffset,
-  //           behavior: 'smooth',
-  //         });
-  //       }
-  //     }
-  //   }
-  //   //eslint-disable-next-line
-  // }, [photoSwipe]);
+          window.scrollTo({
+            top: absoluteElementCenter - window.innerHeight / 2 + scrollOffset,
+            behavior: 'smooth',
+          });
+        }
+      }
+    }
+    //eslint-disable-next-line
+  }, [photoSwipe]);
 
   // Remove the hash on load if photoswipe is closed
   useEffect(() => {

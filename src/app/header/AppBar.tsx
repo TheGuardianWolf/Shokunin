@@ -1,4 +1,4 @@
-import { ChevronLeft, Storage } from '@material-ui/icons';
+import { ChevronLeft, Search, Storage } from '@material-ui/icons';
 import {
   IconButton,
   AppBar as MaterialAppBar,
@@ -7,6 +7,8 @@ import {
   Toolbar,
   Typography,
   makeStyles,
+  useMediaQuery,
+  useTheme,
 } from '@material-ui/core';
 import React, { useEffect, useMemo, useState } from 'react';
 import { generateSearchQuery, getSearchParams } from 'util/search-utils';
@@ -25,42 +27,30 @@ const useStyles = makeStyles((theme) => ({
   },
   toolbar: {
     flexWrap: 'wrap',
+    position: 'relative',
   },
   toolbarButtonNavigateBack: {
     marginRight: theme.spacing(2),
-    order: 1,
     [theme.breakpoints.down('xs')]: {
       marginRight: 0,
     },
   },
   toolbarButtonServerSelect: {
     marginLeft: 'auto',
-    order: 4,
-    [theme.breakpoints.down('xs')]: {
-      order: 3,
-    },
   },
   title: {
     marginRight: theme.spacing(4),
-    textAlign: 'center',
-    order: 2,
     [theme.breakpoints.down('xs')]: {
-      flexGrow: 1,
-      marginRight: '48px',
+      marginRight: theme.spacing(2),
     },
   },
   searchInput: {
     flexGrow: 1,
+    flexBasis: 0,
+    minWidth: 0,
     maxWidth: '666px',
-    order: 3,
-    marginRight: theme.spacing(4),
-    [theme.breakpoints.down('xs')]: {
-      maxWidth: '100%',
-      width: '100%',
-      marginRight: 0,
-      marginTop: '12px',
-      marginBottom: '12px',
-    },
+    marginRight: 0,
+    [theme.breakpoints.down('xs')]: {},
   },
 }));
 
@@ -89,6 +79,7 @@ export function AppBar() {
     history.location.search,
   ]);
 
+  const [showSmallSearch, setShowSmallSearch] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [serverSelectAnchorEl, setServerSelectAnchorEl] = useState<
     (EventTarget & HTMLButtonElement) | null
@@ -123,13 +114,18 @@ export function AppBar() {
           Shokunin
         </Typography>
         <SearchInput
-          className={clsx(classes.searchInput, isHome && classes.hidden)}
+          className={clsx(
+            classes.searchInput,
+            isHome && classes.hidden
+            // showSmallSearch && classes.showSmallSearch
+          )}
           disableElevation
           buttonOnRight
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onSubmit={(e) => {
             e.preventDefault();
+            setShowSmallSearch(false);
             history.push({
               ...history.location,
               search: generateSearchQuery(searchInput.split(' ')),

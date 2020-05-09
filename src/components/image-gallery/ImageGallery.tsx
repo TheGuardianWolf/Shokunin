@@ -31,8 +31,11 @@ export interface GalleryImage extends PhotoSwipeItem {
 const useStyles = makeStyles((theme) => ({
   thumbnailGrid: {
     display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
     marginLeft: '-30px' /* gutter size offset */,
     width: 'auto',
+    alignItems: 'center',
   },
   thumbnailColumn: {
     paddingLeft: '15px' /* gutter size */,
@@ -88,7 +91,7 @@ export function ImageGallery({
   scrollPosition: ScrollPosition;
 }) {
   const classes = useStyles();
-  const [columnWidth, setColumnWidth] = useState(400);
+  const [columnHeight, setColumnHeight] = useState(250);
 
   return (
     <PhotoSwipeWrapper
@@ -103,57 +106,33 @@ export function ImageGallery({
           hasMore={hasMore}
           loader={loader}
         >
-          <Masonry
-            className={classes.thumbnailGrid}
-            breakpointCols={{
-              default: 8,
-              2600: 7,
-              2200: 6,
-              1800: 5,
-              1400: 4,
-              1000: 3,
-              600: 2,
-              400: 1,
-            }}
-            columnClassName={classes.thumbnailColumn}
-          >
-            {[
-              <ReactResizeDetector
-                refreshMode="debounce"
-                refreshRate={300}
-                handleWidth
-                onResize={(width) => setColumnWidth(width)}
-                key="resize-detector"
-              />,
-            ].concat(
-              images.map((item, index) => (
-                <ListItem
-                  className={classes.thumbnail}
-                  key={item.id}
-                  button
-                  onClick={() => {
-                    openPhotoSwipe(index);
-                  }}
-                >
-                  <LazyLoadImage
-                    id={item.htmlId}
-                    className={classes.thumbnailImage}
-                    tabIndex={index + 1}
-                    src={item.thumbnail.src}
-                    alt={item.description}
-                    width={columnWidth}
-                    height={(columnWidth / item.thumbnail.w) * item.thumbnail.h}
-                    placeholderSrc={item.lazySrc}
-                    effect={isMobile ? undefined : 'blur'}
-                    scrollPosition={scrollPosition}
-                  />
-                  {/* <div className={classes.thumbnailOverlay}>
+          <div className={classes.thumbnailGrid}>
+            {images.map((item, index) => (
+              <ListItem
+                className={classes.thumbnail}
+                key={item.id}
+                button
+                onClick={() => {
+                  openPhotoSwipe(index);
+                }}
+              >
+                <LazyLoadImage
+                  id={item.htmlId}
+                  className={classes.thumbnailImage}
+                  src={item.thumbnail.src}
+                  alt={item.description}
+                  width={(columnHeight / item.thumbnail.h) * item.thumbnail.w}
+                  height={columnHeight}
+                  placeholderSrc={item.lazySrc}
+                  effect={isMobile ? undefined : 'blur'}
+                  scrollPosition={scrollPosition}
+                />
+                {/* <div className={classes.thumbnailOverlay}>
                     {item.thumbnail.overlay}
                   </div> */}
-                </ListItem>
-              ))
-            )}
-          </Masonry>
+              </ListItem>
+            ))}
+          </div>
         </InfiniteScroll>
       )}
     </PhotoSwipeWrapper>

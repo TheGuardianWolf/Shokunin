@@ -14,8 +14,8 @@ import { useState } from 'react';
 
 const useStyles = makeStyles((theme) => ({
   widthConstraint: {
-    width: '100%',
-    maxWidth: '800px',
+    width: '800px',
+    maxWidth: '100%',
     margin: '0 auto',
     display: 'flex',
     justifyContent: 'center',
@@ -41,6 +41,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   content: {
+    width: '100%',
     padding: '30px',
   },
   description: {},
@@ -99,12 +100,13 @@ const useStyles = makeStyles((theme) => ({
   meta: {},
   metaItem: { display: 'flex' },
   metaItemKey: {
-    minWidth: '140px',
+    minWidth: '120px',
     display: 'inline-block',
     height: '100%',
     color: theme.palette.text.hint,
   },
   metaItemValue: {
+    wordBreak: 'break-word',
     whiteSpace: 'pre-line',
   },
 }));
