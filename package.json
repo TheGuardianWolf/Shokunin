@@ -22,7 +22,7 @@
     "axios": "^0.19.2",
     "lodash": "^4.17.15",
     "node-sass": "^4.13.1",
-    "photoswipe": "https://github.com/TheGuardianWolf/PhotoSwipe#cfa0dd85",
+    "photoswipe": "https://github.com/TheGuardianWolf/PhotoSwipe#75e58fe",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-app-polyfill": "^1.0.6",
