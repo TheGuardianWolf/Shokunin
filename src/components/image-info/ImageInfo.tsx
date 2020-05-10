@@ -156,8 +156,8 @@ export function ImageInfo({
               }`}</h4>
               <span className={classes.headerText}>
                 {post.tags.artist.length > 0
-                  ? post.tags.artist.join(', ')
-                  : 'Unknown'}
+                  ? post.tags.artist.map((x) => x.replace(/_/g, ' ')).join(', ')
+                  : 'unknown artist'}
               </span>
             </div>
             <div className={classes.score}>
