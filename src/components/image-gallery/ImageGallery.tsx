@@ -105,6 +105,7 @@ export function ImageGallery({
   const [galleryWidth, setGalleryWidth] = useState<number | null>(null);
   console.log(smallScreen);
 
+  // pw = r_k * BASIS + GAP * (n - 1)
   const imageLayout = useMemo(() => {
     if (galleryWidth && images) {
       if (smallScreen) {
